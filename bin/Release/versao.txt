@@ -1,0 +1,2 @@
+2.0.8
+VALOR NAS FALTAS|ALTER TABLE Faltas ADD Valor Currency

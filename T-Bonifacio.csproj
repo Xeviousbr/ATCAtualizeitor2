@@ -1,0 +1,403 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{308C57AF-E663-456D-8A2C-188BBD61423D}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>TeleBonifacio</RootNamespace>
+    <AssemblyName>TeleBonifacio</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>dashboard.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="SourceGrid, Version=4.40.4580.29115, Culture=neutral, PublicKeyToken=df6f5e538749e85d, processorArchitecture=MSIL">
+      <HintPath>packages\SourceGrid.4.4.0\lib\net35\SourceGrid.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="CadClientes.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CadClientes.designer.cs">
+      <DependentUpon>CadClientes.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CadEntregadores.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CadEntregadores.designer.cs">
+      <DependentUpon>CadEntregadores.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CadFornec.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CadFornec.Designer.cs">
+      <DependentUpon>CadFornec.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CadTipos.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CadTipos.Designer.cs">
+      <DependentUpon>CadTipos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CadVendedores2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CadVendedores2.designer.cs">
+      <DependentUpon>CadVendedores2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="dao\BaseDAO.cs" />
+    <Compile Include="dao\CaixaDao.cs" />
+    <Compile Include="dao\ClienteDAO.cs" />
+    <Compile Include="dao\ConfigDAO.cs" />
+    <Compile Include="dao\EncomendasDao.cs" />
+    <Compile Include="dao\EntregadorDAO.cs" />
+    <Compile Include="dao\EntregasDAO.cs" />
+    <Compile Include="dao\FaltasDAO.cs" />
+    <Compile Include="dao\FornecedorDao.cs" />
+    <Compile Include="dao\GarantiasDao.cs" />
+    <Compile Include="dao\ProdutosDao.cs" />
+    <Compile Include="dao\ReciboDAO.cs" />
+    <Compile Include="dao\RHDAO.cs" />
+    <Compile Include="dao\TpoFaltaDAO.cs" />
+    <Compile Include="dao\VendedoresDAO.cs" />
+    <Compile Include="Dashboard.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dashboard.Designer.cs">
+      <DependentUpon>Dashboard.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Form1.designer.cs">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FormBase.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FormBase.designer.cs">
+      <DependentUpon>FormBase.cs</DependentUpon>
+    </Compile>
+    <Compile Include="gen\ADO.cs" />
+    <Compile Include="gen\Cripto.cs" />
+    <Compile Include="gen\DB.cs" />
+    <Compile Include="gen\FTP.cs" />
+    <Compile Include="gen\glo.cs" />
+    <Compile Include="gen\INI.cs" />
+    <Compile Include="gen\INI2.cs" />
+    <Compile Include="gen\odbc.cs" />
+    <Compile Include="gen\ValorPorExtenso.cs" />
+    <Compile Include="operAvanc.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="operAvanc.designer.cs">
+      <DependentUpon>operAvanc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="operCaixa.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="operCaixa.designer.cs">
+      <DependentUpon>operCaixa.cs</DependentUpon>
+    </Compile>
+    <Compile Include="operConfig.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="operConfig.designer.cs">
+      <DependentUpon>operConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="operConsulta.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="operConsulta.Designer.cs">
+      <DependentUpon>operConsulta.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OperFalta.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OperFalta.designer.cs">
+      <DependentUpon>OperFalta.cs</DependentUpon>
+    </Compile>
+    <Compile Include="operGarantia.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="operGarantia.designer.cs">
+      <DependentUpon>operGarantia.cs</DependentUpon>
+    </Compile>
+    <Compile Include="operLancamento.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="operLancamento.designer.cs">
+      <DependentUpon>operLancamento.cs</DependentUpon>
+    </Compile>
+    <Compile Include="operLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="operLogin.designer.cs">
+      <DependentUpon>operLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OperRH.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OperRH.designer.cs">
+      <DependentUpon>OperRH.cs</DependentUpon>
+    </Compile>
+    <Compile Include="operSQL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="operSQL.designer.cs">
+      <DependentUpon>operSQL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="opRecibos.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="opRecibos.Designer.cs">
+      <DependentUpon>opRecibos.cs</DependentUpon>
+    </Compile>
+    <Compile Include="pesCliente.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="pesCliente.designer.cs">
+      <DependentUpon>pesCliente.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\CadVendedores.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Properties\CadVendedores.designer.cs">
+      <DependentUpon>CadVendedores.cs</DependentUpon>
+    </Compile>
+    <Compile Include="rel\Caixa.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="rel\Caixa.designer.cs">
+      <DependentUpon>Caixa.cs</DependentUpon>
+    </Compile>
+    <Compile Include="rel\Extrato.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="rel\Extrato.Designer.cs">
+      <DependentUpon>Extrato.cs</DependentUpon>
+    </Compile>
+    <Compile Include="rel\Receipt.cs" />
+    <Compile Include="rel\RelEntregas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="rel\RelEntregas.designer.cs">
+      <DependentUpon>RelEntregas.cs</DependentUpon>
+    </Compile>
+    <Compile Include="tb\CampoTagInfo.cs" />
+    <Compile Include="tb\Cliente.cs" />
+    <Compile Include="tb\ComboBoxItem.cs" />
+    <Compile Include="tb\Encomendas.cs" />
+    <Compile Include="tb\Entregador.cs" />
+    <Compile Include="tb\Entregas.cs" />
+    <Compile Include="tb\Falta .cs" />
+    <Compile Include="tb\Fornecedor.cs" />
+    <Compile Include="tb\Garantias.cs" />
+    <Compile Include="tb\IDataEntity.cs" />
+    <Compile Include="tb\Produtos.cs" />
+    <Compile Include="tb\Recibo.cs" />
+    <Compile Include="tb\TpoFalta .cs" />
+    <Compile Include="tb\Vendedor.cs" />
+    <EmbeddedResource Include="CadClientes.resx">
+      <DependentUpon>CadClientes.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CadEntregadores.resx">
+      <DependentUpon>CadEntregadores.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CadFornec.resx">
+      <DependentUpon>CadFornec.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CadTipos.resx">
+      <DependentUpon>CadTipos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CadVendedores2.resx">
+      <DependentUpon>CadVendedores2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dashboard.resx">
+      <DependentUpon>Dashboard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FormBase.resx">
+      <DependentUpon>FormBase.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="operAvanc.resx">
+      <DependentUpon>operAvanc.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="operCaixa.resx">
+      <DependentUpon>operCaixa.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="operConfig.resx">
+      <DependentUpon>operConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="operConsulta.resx">
+      <DependentUpon>operConsulta.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OperFalta.resx">
+      <DependentUpon>OperFalta.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="operGarantia.resx">
+      <DependentUpon>operGarantia.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="operLancamento.resx">
+      <DependentUpon>operLancamento.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="operLogin.resx">
+      <DependentUpon>operLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OperRH.resx">
+      <DependentUpon>OperRH.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="operSQL.resx">
+      <DependentUpon>operSQL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="opRecibos.resx">
+      <DependentUpon>opRecibos.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="pesCliente.resx">
+      <DependentUpon>pesCliente.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\CadVendedores.resx">
+      <DependentUpon>CadVendedores.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="rel\Caixa.resx">
+      <DependentUpon>Caixa.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rel\Extrato.resx">
+      <DependentUpon>Extrato.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="rel\RelEntregas.resx">
+      <DependentUpon>RelEntregas.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\OrCarro\ATCRecordNavigator\ATCRecordNavigator\ATCRecordNavigator\ATCRecordNavigator.csproj">
+      <Project>{6da04d20-798d-46db-92b6-581aac550b31}</Project>
+      <Name>ATCRecordNavigator</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 e x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\exemplo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="dashboard.ico" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
