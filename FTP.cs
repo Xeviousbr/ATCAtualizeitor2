@@ -51,76 +51,47 @@ namespace TeleBonifacio
             Stream responseStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(responseStream);
 
-            //string info = reader.ReadToEnd();
-            //string[] lines = info.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-            //string versaoTexto = lines[0];
-            //this.Mensagem = lines[1];
-            //this.ComandosSQL = new List<string>();
-            //// Verifica se há um comando SQL após a mensagem
-            //if (lines[1].Contains("|"))
-            //{
-            //    // Separa a mensagem da linha contendo o comando SQL
-            //    string[] parts = lines[1].Split(new char[] { '|' }, 2);
-
-            //    this.Mensagem = parts[0]; // A primeira parte antes do '|'
-            //    string comandoSQL = parts[1].Trim(); // A segunda parte após o '|'
-
-            //    // Adiciona o comando SQL à lista
-            //    this.ComandosSQL.Add(comandoSQL);
-            //}
-            //else
-            //{
-            //    // Se não houver comando SQL, apenas adiciona a mensagem à lista
-            //    this.ComandosSQL.Add(lines[1]);
-            //}
-
-            //// Continua com a lógica original para adicionar outros comandos SQL presentes no arquivo
-            //for (int i = 2; i < lines.Length; i++)
-            //{
-            //    string line = lines[i].Trim();
-            //    if (!string.IsNullOrEmpty(line) && !line.Contains("|")) // Ignora linhas que contêm '|'
-            //    {
-            //        string comandoSQL = line;
-            //        while (!comandoSQL.EndsWith(";") && i + 1 < lines.Length)
-            //        {
-            //            i++;
-            //            comandoSQL += " " + lines[i].Trim();
-            //        }
-            //        ComandosSQL.Add(comandoSQL);
-            //    }
-            //}
-
             string info = reader.ReadToEnd();
-            string[] lines = info.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+            string[] lines = info.Split('|');
             string versaoTexto = lines[0];
-            // this.Mensagem = lines[1];
+            this.Mensagem = lines[1];
             this.ComandosSQL = new List<string>();
-            if (lines[1].Contains("|"))
+            if (lines.Length > 2)
             {
-                string[] parts = lines[1].Split(new char[] { '|' }, 2);
-                this.Mensagem = parts[0]; 
-                string comandoSQL = parts[1].Trim(); 
-                this.ComandosSQL.Add(comandoSQL);
+                for (int i = 2; i < lines.Length; i++)
+                {
+                    this.ComandosSQL.Add(lines[i]);
+                }
             }
-            else
-            {
-                this.Mensagem = lines[1];
-                // this.ComandosSQL.Add(lines[1]);
-            }
-            //for (int i = 2; i < lines.Length; i++)
-            //{
-            //    string line = lines[i].Trim();
-            //    if (!string.IsNullOrEmpty(line))
-            //    {
-            //        string comandoSQL = line;
-            //        while (!comandoSQL.EndsWith(";") && i + 1 < lines.Length)
-            //        {
-            //            i++;
-            //            comandoSQL += " " + lines[i].Trim();
-            //        }
-            //        ComandosSQL.Add(comandoSQL);
-            //    }
-            //}
+                //if (lines.Length > 1)
+                //{
+                //    string[] parts = lines[1].Split('|');
+                //    this.Mensagem = parts[0].Trim();
+                //    for (int i = 1; i < parts.Length; i++)
+                //    {
+                //        if (!string.IsNullOrEmpty(parts[i]))
+                //        {
+                //            this.ComandosSQL.Add(parts[i].Trim());
+                //        }
+                //    }
+                //}
+
+                //string info = reader.ReadToEnd();
+                //string[] lines = info.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                //string versaoTexto = lines[0];
+                //this.ComandosSQL = new List<string>();
+                //if (lines[1].Contains("|"))
+                //{
+                //    string[] parts = lines[1].Split(new char[] { '|' }, 2);
+                //    this.Mensagem = parts[0]; 
+                //    string comandoSQL = parts[1].Trim(); 
+                //    this.ComandosSQL.Add(comandoSQL);
+                //}
+                //else
+                //{
+                //    this.Mensagem = lines[1];
+                //}
+
             reader.Close();
             responseStream.Close();
             response.Close();
@@ -150,6 +121,7 @@ namespace TeleBonifacio
             {
                 return true;
             }
+
             string Suri = "ftp://" + this.ftpIPServidor + @"/" + nmPasta + @"/" + nomeArquivoLocal;
             FtpWebRequest requisicaoFTP;
             requisicaoFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(Suri));

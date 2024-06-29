@@ -1,0 +1,12 @@
+D:\Prog\ATCAtualizeitor2\bin\Release\ATCAtualizeitor.exe.config
+D:\Prog\ATCAtualizeitor2\bin\Release\ATCAtualizeitor.exe
+D:\Prog\ATCAtualizeitor2\bin\Release\ATCAtualizeitor.pdb
+D:\Prog\ATCAtualizeitor2\bin\Release\SourceGrid.dll
+D:\Prog\ATCAtualizeitor2\bin\Release\SourceGrid.xml
+D:\Prog\ATCAtualizeitor2\obj\Release\ATCAtualizeitor2.csproj.AssemblyReference.cache
+D:\Prog\ATCAtualizeitor2\obj\Release\ATCAtualizeitor.Form1.resources
+D:\Prog\ATCAtualizeitor2\obj\Release\ATCAtualizeitor.Properties.Resources.resources
+D:\Prog\ATCAtualizeitor2\obj\Release\ATCAtualizeitor2.csproj.GenerateResource.cache
+D:\Prog\ATCAtualizeitor2\obj\Release\ATCAtualizeitor2.csproj.CoreCompileInputs.cache
+D:\Prog\ATCAtualizeitor2\obj\Release\ATCAtualizeitor.exe
+D:\Prog\ATCAtualizeitor2\obj\Release\ATCAtualizeitor.pdb
