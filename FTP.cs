@@ -50,7 +50,6 @@ namespace TeleBonifacio
             }
             Stream responseStream = response.GetResponseStream();
             StreamReader reader = new StreamReader(responseStream);
-
             string info = reader.ReadToEnd();
             string[] lines = info.Split('|');
             string versaoTexto = lines[0];
@@ -63,35 +62,6 @@ namespace TeleBonifacio
                     this.ComandosSQL.Add(lines[i]);
                 }
             }
-                //if (lines.Length > 1)
-                //{
-                //    string[] parts = lines[1].Split('|');
-                //    this.Mensagem = parts[0].Trim();
-                //    for (int i = 1; i < parts.Length; i++)
-                //    {
-                //        if (!string.IsNullOrEmpty(parts[i]))
-                //        {
-                //            this.ComandosSQL.Add(parts[i].Trim());
-                //        }
-                //    }
-                //}
-
-                //string info = reader.ReadToEnd();
-                //string[] lines = info.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-                //string versaoTexto = lines[0];
-                //this.ComandosSQL = new List<string>();
-                //if (lines[1].Contains("|"))
-                //{
-                //    string[] parts = lines[1].Split(new char[] { '|' }, 2);
-                //    this.Mensagem = parts[0]; 
-                //    string comandoSQL = parts[1].Trim(); 
-                //    this.ComandosSQL.Add(comandoSQL);
-                //}
-                //else
-                //{
-                //    this.Mensagem = lines[1];
-                //}
-
             reader.Close();
             responseStream.Close();
             response.Close();

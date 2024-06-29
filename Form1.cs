@@ -142,12 +142,15 @@ namespace ATCAtualizeitor
                     Loga("arquivoBackup : " + arquivoBackup);
                     int versaoFtp = cFPT.LerVersaoDoFtp();
                     string versaoNovaStr = $"{versaoFtp / 100}.{(versaoFtp / 10) % 10}.{versaoFtp % 10}";
+                    Loga("Atualizando para " + versaoNovaStr);
                     string VersaoAnterior = cINI.ReadString("Config", "VersaoAtual", "");
                     if (VersaoAnterior.Length > 0)
                     {
+                        Loga("VersaoAnterior = "+ versaoNovaStr);
                         cINI.WriteString("Atualizador", "VersaoAnterior", versaoNovaStr);
                     }
                     List<string> ComandosSQL = cFPT.getComandos();
+                    Loga("Quantidade de comandos SQL" + ComandosSQL.Count.ToString());
                     if (ComandosSQL.Count > 0)
                     {
                         string CaminhoBase = cINI.ReadString("Config", "Base", "");
