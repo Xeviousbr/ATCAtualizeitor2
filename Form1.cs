@@ -5,8 +5,6 @@ using System.Data.OleDb;
 using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
-using TeleBonifacio;
-//using TeleBonifacio.gen;
 
 namespace ATCAtualizeitor
 {
@@ -33,7 +31,7 @@ namespace ATCAtualizeitor
                     catch (Exception Ex)
                     {
                         this.ERRO = Ex.ToString();
-                        Loga(this.ERRO);
+                        Log.Loga(this.ERRO);
                         throw;
                     }
                     try
@@ -44,7 +42,7 @@ namespace ATCAtualizeitor
                     {
                         this.erros++;
                         this.ERRO = Ex.ToString();
-                        Loga(this.ERRO);
+                        Log.Loga(this.ERRO);
                     }
                 }
             }
@@ -89,9 +87,9 @@ namespace ATCAtualizeitor
                 }
                 MessageBox.Show(mensagem, "Houveram erros de SQL", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            Loga("Acionando programa em "+ arquivoDestino);
+            Log.Loga("Acionando programa em "+ arquivoDestino);
             Process.Start(arquivoDestino);
-            Loga("Fechando atualizador");
+            Log.Loga("Fechando atualizador");
             Environment.Exit(0);
         }
 
@@ -101,11 +99,11 @@ namespace ATCAtualizeitor
             string Retornar = cINI.ReadString("Atualizador", "Retornar", "");
             string PastaDoEntregas = cINI.ReadString("Atualizacao", "Programa", "");
             string pastaBackup = Path.Combine(PastaDoEntregas, "Bak");
-            Loga("Retornar = " + Retornar);
+            Log.Loga("Retornar = " + Retornar);
             if (Retornar=="1") 
             {
                 string arquivoOrigem = @"C:\Entregas\Bak\TeleBonifacio.exe";
-                Loga("arquivoOrigem = " + arquivoOrigem);
+                Log.Loga("arquivoOrigem = " + arquivoOrigem);
                 File.Copy(arquivoOrigem, arquivoDestino, true);
                 cINI.WriteString("Atualizador", "Retornar", "0");
                 System.Threading.Thread.Sleep(1000);
@@ -129,44 +127,44 @@ namespace ATCAtualizeitor
                     long bytesReceived = cFPT.bytesReceived;
                     cINI.WriteString("Config", "tamanho", bytesReceived.ToString());
                     string pastaPrograma = Path.Combine(pastaAtual, "..");
-                    Loga("pastaAtual : " + pastaAtual);
-                    Loga("pastaPrograma : " + pastaPrograma);
-                    Loga("pastaBackup : " + pastaBackup);
+                    Log.Loga("pastaAtual : " + pastaAtual);
+                    Log.Loga("pastaPrograma : " + pastaPrograma);
+                    Log.Loga("pastaBackup : " + pastaBackup);
                     if (!Directory.Exists(pastaBackup))
                     {
                         Directory.CreateDirectory(pastaBackup);
                     }
                     string PastaDestino = cINI.ReadString("Config", "Programa", "");
-                    Loga("arquivoLocal : " + arquivoLocal);
-                    Loga("arquivoDestino : " + arquivoDestino);
-                    Loga("arquivoBackup : " + arquivoBackup);
+                    Log.Loga("arquivoLocal : " + arquivoLocal);
+                    Log.Loga("arquivoDestino : " + arquivoDestino);
+                    Log.Loga("arquivoBackup : " + arquivoBackup);
                     int versaoFtp = cFPT.LerVersaoDoFtp();
                     string versaoNovaStr = $"{versaoFtp / 100}.{(versaoFtp / 10) % 10}.{versaoFtp % 10}";
-                    Loga("Atualizando para " + versaoNovaStr);
+                    Log.Loga("Atualizando para " + versaoNovaStr);
                     string VersaoAnterior = cINI.ReadString("Config", "VersaoAtual", "");
                     if (VersaoAnterior.Length > 0)
                     {
-                        Loga("VersaoAnterior = "+ versaoNovaStr);
+                        Log.Loga("VersaoAnterior = "+ versaoNovaStr);
                         cINI.WriteString("Atualizador", "VersaoAnterior", versaoNovaStr);
                     }
                     List<string> ComandosSQL = cFPT.getComandos();
-                    Loga("Quantidade de comandos SQL" + ComandosSQL.Count.ToString());
+                    Log.Loga("Quantidade de comandos SQL" + ComandosSQL.Count.ToString());
                     if (ComandosSQL.Count > 0)
                     {
                         string CaminhoBase = cINI.ReadString("Config", "Base", "");
                         connectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + CaminhoBase + ";";
                         for (int i = 0; i < ComandosSQL.Count; i++)
                         {
-                            Loga(ComandosSQL[i]);
+                            Log.Loga(ComandosSQL[i]);
                             ExecutarComandoSQL(ComandosSQL[i]);
-                            Loga("Comando Executado");
+                            Log.Loga("Comando Executado");
                         }
                     }
                     cINI.WriteString("Config", "VersaoAtual", versaoNovaStr);
                     System.Threading.Thread.Sleep(100);
                     File.Copy(arquivoLocal, arquivoDestino, true);
                     System.Threading.Thread.Sleep(100);
-                    Loga("Executar programa em " + arquivoDestino);
+                    Log.Loga("Executar programa em " + arquivoDestino);
                     this.Invoke(new MethodInvoker(delegate { this.WindowState = FormWindowState.Minimized; }));
                     System.Threading.Thread.Sleep(1000);
                     e.Result = true;
@@ -178,14 +176,14 @@ namespace ATCAtualizeitor
             }
         }
 
-        private void Loga(string message)
-        {
-            string logFilePath = @"C:\Entregas\Atualizador.txt";
-            using (StreamWriter writer = new StreamWriter(logFilePath, true))
-            {
-                writer.WriteLine($"{DateTime.Now}: {message}");
-            }
-        }
+        //private void Loga(string message)
+        //{
+        //    string logFilePath = @"C:\Entregas\Atualizador.txt";
+        //    using (StreamWriter writer = new StreamWriter(logFilePath, true))
+        //    {
+        //        writer.WriteLine($"{DateTime.Now}: {message}");
+        //    }
+        //}
 
     }
 }
