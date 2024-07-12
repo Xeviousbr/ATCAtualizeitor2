@@ -65,6 +65,7 @@ namespace RH
             this.textBox1.Size = new System.Drawing.Size(64, 29);
             this.textBox1.TabIndex = 3;
             this.textBox1.Text = "12:59";
+            this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // lbNome
             // 

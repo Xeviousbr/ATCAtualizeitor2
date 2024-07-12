@@ -51,6 +51,18 @@ namespace RH
                 return defvalue;
             }
         }
+
+        public DateTime ReadTime(string section, string ident, DateTime defvalue)
+        {
+            string timeString = ReadString(section, ident, defvalue.ToString("HH:mm"));
+            if (DateTime.TryParseExact(timeString, "HH:mm", null, System.Globalization.DateTimeStyles.None, out DateTime result))
+            {
+                return result;
+            }
+            return defvalue;
+        }
+
+
         #endregion
 
         #region Write functions
