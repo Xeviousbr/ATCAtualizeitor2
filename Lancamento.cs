@@ -24,7 +24,10 @@ namespace RH
             DateTime FimDia = OIni.ReadTime("Turnos", "TarFim", new DateTime(1, 1, 1, 18, 0, 0));
             DateTime fimCafeManha = FimManha.AddMinutes(-15); // 11:45
             DateTime fimCafeTarde = FimDia.AddMinutes(-15); // 17:45
-            currentTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 17, 50, 0);
+
+            currentTime = DateTime.Now;
+            // currentTime = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 18, 25, 0);            
+
             textBox1.Text = currentTime.ToString("HH:mm");
             VerificarStatusLancamento(FimManha, FimDia, fimCafeManha, fimCafeTarde);
         }
@@ -50,7 +53,7 @@ namespace RH
         private void VerificarStatusLancamento(DateTime fimManha, DateTime fimDia, DateTime fimCafeManha, DateTime fimCafeTarde)
         {
             var lancamentoInfo = ObterLancamentoInfo();
-
+            lancamentoStatus = LancamentoStatus.Vazio;
             if (lancamentoInfo == null)
             {
                 handleNewEntry(currentTime, fimManha);
@@ -64,8 +67,10 @@ namespace RH
                     handleAfternoonAndEveningChecks(lancamentoInfo, currentTime, fimManha, fimDia);
                 }
             }
-
-            checkLateCafeHours(currentTime, fimCafeManha, fimManha, fimCafeTarde, fimDia);
+            if (lancamentoStatus == LancamentoStatus.Vazio)
+            {
+                checkLateCafeHours(currentTime, fimCafeManha, fimManha, fimCafeTarde, fimDia);
+            }            
         }
 
         private void handleAfternoonAndEveningChecks(LancamentoInfo info, DateTime currentTime, DateTime fimManha, DateTime fimDia)
@@ -132,6 +137,7 @@ namespace RH
 
         private void handleNewEntry(DateTime currentTime, DateTime fimManha)
         {
+            // Verifica se a hora atual já ultrapassou o fim da manhã, indicando que é tarde
             if (currentTime.TimeOfDay >= fimManha.TimeOfDay)
             {
                 lbInfo.Text = $"Início da tarde";
@@ -143,6 +149,20 @@ namespace RH
                 lancamentoStatus = LancamentoStatus.IniciarExpediente;
             }
         }
+
+        //private void handleNewEntry(DateTime currentTime, DateTime fimManha)
+        //{
+        //    if (currentTime.TimeOfDay >= fimManha.TimeOfDay)
+        //    {
+        //        lbInfo.Text = $"Início da tarde";
+        //        lancamentoStatus = LancamentoStatus.IniciarTarde;
+        //    }
+        //    else
+        //    {
+        //        lbInfo.Text = $"Início do Expediente";
+        //        lancamentoStatus = LancamentoStatus.IniciarExpediente;
+        //    }
+        //}
 
         private LancamentoInfo ObterLancamentoInfo()
         {
@@ -280,6 +300,7 @@ public class LancamentoInfo
 
 public enum LancamentoStatus
 {
+    Vazio,
     SaidaManha,
     EntradaTarde,
     SaidaTarde,

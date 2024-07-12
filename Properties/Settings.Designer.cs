@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace TeleBonifacio.Properties {
+namespace RH.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

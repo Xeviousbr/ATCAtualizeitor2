@@ -1,0 +1,13 @@
+D:\Prog\RH\obj\Release\RH.csproj.AssemblyReference.cache
+D:\Prog\RH\obj\Release\RH.Form1.resources
+D:\Prog\RH\obj\Release\RH.Lancamento.resources
+D:\Prog\RH\obj\Release\RH.Properties.Resources.resources
+D:\Prog\RH\obj\Release\RH.csproj.GenerateResource.cache
+D:\Prog\RH\obj\Release\RH.csproj.CoreCompileInputs.cache
+D:\Prog\RH\bin\Release\RH.exe.config
+D:\Prog\RH\bin\Release\RH.exe
+D:\Prog\RH\bin\Release\RH.pdb
+D:\Prog\RH\bin\Release\SourceGrid.dll
+D:\Prog\RH\bin\Release\SourceGrid.xml
+D:\Prog\RH\obj\Release\RH.exe
+D:\Prog\RH\obj\Release\RH.pdb
