@@ -141,7 +141,7 @@ namespace RH
             if (currentTime.TimeOfDay >= fimManha.TimeOfDay)
             {
                 lbInfo.Text = $"Início da tarde";
-                lancamentoStatus = LancamentoStatus.IniciarTarde;
+                lancamentoStatus = LancamentoStatus.EntradaTarde;
             }
             else
             {
@@ -225,55 +225,149 @@ namespace RH
             {
                 string sql;
                 string horaLanc = currentTime.ToString("yyyy-MM-dd HH:mm:ss");
-                string campo = "";
                 string valor = $"'{horaLanc}'";
+                bool requiresInsert = false;
 
-                switch (lancamentoStatus)
+                // Checa se já existe um registro para hoje e define se requer insert
+                if (lancamentoStatus == LancamentoStatus.EntradaTarde && !ExistemLancamentosHoje())
                 {
-                    case LancamentoStatus.SaidaManha:
-                        campo = "txfmman";
-                        break;
-                    case LancamentoStatus.EntradaTarde:
-                        campo = "txintrd";
-                        break;
-                    case LancamentoStatus.SaidaTarde:
-                        campo = "txfntrd";
-                        break;
-                    case LancamentoStatus.EntradaCafeManha:
-                        campo = "txInCafeMan";
-                        break;
-                    case LancamentoStatus.SaidaCafeManha:
-                        campo = "txFmCafeMan";
-                        break;
-                    case LancamentoStatus.EntradaCafeTarde:
-                        campo = "txInCafeTrd";
-                        break;
-                    case LancamentoStatus.SaidaCafeTarde:
-                        campo = "txFmCafeTrd";
-                        break;
-                    case LancamentoStatus.IniciarExpediente:
-                        string UID = glo.GenerateUID();
-                        sql = $@"INSERT INTO horarios (idfunc, txinman, data, uid) VALUES ({glo.iUsuario}, {valor}, Date(), '{UID}')";
-                        DB.ExecutarComandoSQL(sql);
-                        this.Close();
-                        return;
-                    case LancamentoStatus.Completo:
-                        MessageBox.Show("Todos os lançamentos de hoje estão completos.");
-                        this.Close();
-                        return;
-                    default:
-                        return; // Se o status não é reconhecido, não faz nada.
+                    requiresInsert = true;
                 }
 
-                // Se o campo foi definido, monta e executa o SQL para update
-                if (!string.IsNullOrEmpty(campo))
+                if (requiresInsert)
                 {
-                    sql = $@"UPDATE horarios SET {campo} = {valor} WHERE idfunc = {glo.iUsuario} AND data = Date()";
+                    string UID = glo.GenerateUID();
+                    sql = $@"INSERT INTO horarios (idfunc, txinman, data, uid) VALUES ({glo.iUsuario}, NULL, Date(), '{UID}')";
                     DB.ExecutarComandoSQL(sql);
+                    // Após inserir, precisa atualizar o campo específico
+                    sql = $@"UPDATE horarios SET txintrd = {valor} WHERE idfunc = {glo.iUsuario} AND data = Date()";
+                    DB.ExecutarComandoSQL(sql);
+                }
+                else
+                {
+                    string campo = "";
+                    switch (lancamentoStatus)
+                    {
+                        case LancamentoStatus.IniciarExpediente:
+                            string UID = glo.GenerateUID();
+                            sql = $@"INSERT INTO horarios (idfunc, txinman, data, uid) VALUES ({glo.iUsuario}, {valor}, Date(), '{UID}')";
+                            DB.ExecutarComandoSQL(sql);
+                            this.Close();
+                            return;
+                        case LancamentoStatus.EntradaCafeManha:
+                            campo = "txInCafeMan";
+                            break;
+                        case LancamentoStatus.SaidaCafeManha:
+                            campo = "txFmCafeMan";
+                            break;
+                        case LancamentoStatus.SaidaManha:
+                            campo = "txfmman";
+                            break;
+                        case LancamentoStatus.EntradaTarde:
+                            campo = "txintrd";
+                            break;
+                        case LancamentoStatus.EntradaCafeTarde:
+                            campo = "txInCafeTrd";
+                            break;
+                        case LancamentoStatus.SaidaCafeTarde:
+                            campo = "txFmCafeTrd";
+                            break;
+                        case LancamentoStatus.SaidaTarde:
+                            campo = "txfntrd";
+                            break;
+                        case LancamentoStatus.Completo:
+                            MessageBox.Show("Todos os lançamentos de hoje estão completos.");
+                            this.Close();
+                            return;
+                        default:
+                            return; // Se o status não é reconhecido, não faz nada.
+                    }
+
+                    if (!string.IsNullOrEmpty(campo))
+                    {
+                        sql = $@"UPDATE horarios SET {campo} = {valor} WHERE idfunc = {glo.iUsuario} AND data = Date()";
+                        DB.ExecutarComandoSQL(sql);
+                    }
                 }
             }
             this.Close();
         }
+
+        private bool ExistemLancamentosHoje()
+        {
+            using (OleDbConnection connection = new OleDbConnection(glo.connectionString))
+            {
+                string query = $@"SELECT COUNT(*) FROM horarios WHERE idfunc = {glo.iUsuario} AND data = Date()";
+                OleDbCommand command = new OleDbCommand(query, connection);
+                try
+                {
+                    connection.Open();
+                    int count = (int)command.ExecuteScalar();
+                    return count > 0;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Erro ao verificar lançamentos: {ex.Message}");
+                    return false;
+                }
+            }
+        }
+
+
+        //private void button1_Click(object sender, EventArgs e)
+        //{
+        //    if (button1.Text != "Fechar")
+        //    {
+        //        string sql;
+        //        string horaLanc = currentTime.ToString("yyyy-MM-dd HH:mm:ss");
+        //        string campo = "";
+        //        string valor = $"'{horaLanc}'";
+        //        switch (lancamentoStatus)
+        //        {
+        //            case LancamentoStatus.IniciarExpediente:
+        //                string UID = glo.GenerateUID();
+        //                sql = $@"INSERT INTO horarios (idfunc, txinman, data, uid) VALUES ({glo.iUsuario}, {valor}, Date(), '{UID}')";
+        //                DB.ExecutarComandoSQL(sql);
+        //                this.Close();
+        //                return;
+        //            case LancamentoStatus.EntradaCafeManha:
+        //                campo = "txInCafeMan";
+        //                break;
+        //            case LancamentoStatus.SaidaCafeManha:
+        //                campo = "txFmCafeMan";
+        //                break;
+        //            case LancamentoStatus.SaidaManha:
+        //                campo = "txfmman";
+        //                break;
+        //            case LancamentoStatus.EntradaTarde:
+        //                campo = "txintrd";
+        //                break;
+        //            case LancamentoStatus.EntradaCafeTarde:
+        //                campo = "txInCafeTrd";
+        //                break;
+        //            case LancamentoStatus.SaidaCafeTarde:
+        //                campo = "txFmCafeTrd";
+        //                break;
+        //            case LancamentoStatus.SaidaTarde:
+        //                campo = "txfntrd";
+        //                break;
+        //            case LancamentoStatus.Completo:
+        //                MessageBox.Show("Todos os lançamentos de hoje estão completos.");
+        //                this.Close();
+        //                return;
+        //            default:
+        //                return; // Se o status não é reconhecido, não faz nada.
+        //        }
+
+        //        // Se o campo foi definido, monta e executa o SQL para update
+        //        if (!string.IsNullOrEmpty(campo))
+        //        {
+        //            sql = $@"UPDATE horarios SET {campo} = {valor} WHERE idfunc = {glo.iUsuario} AND data = Date()";
+        //            DB.ExecutarComandoSQL(sql);
+        //        }
+        //    }
+        //    this.Close();
+        //}
 
         private void Lancamento_FormClosed(object sender, FormClosedEventArgs e)
         {
@@ -301,17 +395,15 @@ public class LancamentoInfo
 public enum LancamentoStatus
 {
     Vazio,
-    SaidaManha,
-    EntradaTarde,
-    SaidaTarde,
+    IniciarExpediente,
     EntradaCafeManha,
     SaidaCafeManha,
-    CafeTarde,
+    SaidaManha,
+    EntradaTarde,
+    EntradaCafeTarde,
     SaidaCafeTarde,
-    IniciarExpediente,
-    IniciarTarde,
-    Completo,
-    EntradaCafeTarde
+    SaidaTarde,
+    Completo,        
 }
 
 #endregion
