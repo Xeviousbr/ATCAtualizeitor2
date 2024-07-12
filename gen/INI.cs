@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.IO;
-using System.Windows.Forms;
 
-namespace ATCAtualizeitor
+namespace RH
 {
-    internal class INI
+    public class INI
     {
         private string FileName;
 

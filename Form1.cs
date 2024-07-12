@@ -1,189 +1,54 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data.OleDb;
-using System.Diagnostics;
-using System.IO;
+using System.Data;
 using System.Windows.Forms;
 
-namespace ATCAtualizeitor
+namespace RH
 {
     public partial class Form1 : Form
     {
-        private FTP cFPT;
-        private BackgroundWorker worker;
-        private string arquivoDestino = @"C:\Entregas\TeleBonifacio.exe";
         private INI cINI;
         private string connectionString = "";
-        private int erros = 0;
-        private string ERRO = "";
-
-        private void ExecutarComandoSQL(string query)
-        {
-            using (OleDbConnection connection = new OleDbConnection(connectionString))
-            {
-                using (OleDbCommand command = new OleDbCommand(query, connection))
-                {
-                    try
-                    {
-                        connection.Open();
-                    }
-                    catch (Exception Ex)
-                    {
-                        this.ERRO = Ex.ToString();
-                        Log.Loga(this.ERRO);
-                        throw;
-                    }
-                    try
-                    {
-                        command.ExecuteNonQuery();
-                    }
-                    catch (Exception Ex)
-                    {
-                        this.erros++;
-                        this.ERRO = Ex.ToString();
-                        Log.Loga(this.ERRO);
-                    }
-                }
-            }
-        }
 
         public Form1()
         {
             InitializeComponent();
-            worker = new BackgroundWorker();
-            worker.WorkerReportsProgress = true;
-            worker.DoWork += Worker_DoWork;
-            worker.ProgressChanged += Worker_ProgressChanged;
-            worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            worker.RunWorkerAsync();
+            
         }
 
-        private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        private void btOK_Click(object sender, EventArgs e)
         {
-            int value = e.ProgressPercentage;
-            if (value >= progressBar1.Minimum && value <= progressBar1.Maximum)
-            {
-                progressBar1.Value = value;
-                this.Text = "Atualizador " + value.ToString() + " %";
-            }
+            Busca();
         }
 
-        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {            
-            if (erros>0)
-            {
-                string mensagem = "";
-                if (erros==1)
-                {
-                    mensagem = ERRO;
-                } else
-                {
-                    mensagem = "Olhe o log para er os erros";
-                }
-                MessageBox.Show(mensagem, "Houveram erros de SQL", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            Log.Loga("Acionando programa em "+ arquivoDestino);
-            Process.Start(arquivoDestino);
-            Log.Loga("Fechando atualizador");
-            Environment.Exit(0);
-        }
-
-        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        private void Busca()
         {
-            cINI = new INI();
-            string Retornar = cINI.ReadString("Atualizador", "Retornar", "");
-            string PastaDoEntregas = cINI.ReadString("Atualizacao", "Programa", "");
-            string pastaBackup = Path.Combine(PastaDoEntregas, "Bak");
-            Log.Loga("Retornar = " + Retornar);
-            if (Retornar=="1") 
+            VendedoresDAO dVend = new VendedoresDAO();
+            glo.iUsuario = dVend.getUsuarioNro(txNro.Text);
+            if (glo.iUsuario > 0)
             {
-                string arquivoOrigem = @"C:\Entregas\Bak\TeleBonifacio.exe";
-                Log.Loga("arquivoOrigem = " + arquivoOrigem);
-                File.Copy(arquivoOrigem, arquivoDestino, true);
-                cINI.WriteString("Atualizador", "Retornar", "0");
-                System.Threading.Thread.Sleep(1000);
-                e.Result = true;
-            } else
+                glo.NomeUser = dVend.getNome();
+                Lancamento fLanc = new Lancamento();
+                fLanc.Show();
+                this.Visible = false;
+            }
+            else
             {
-                string URL = cINI.ReadString("FTP", "URL", "");
-                string user = Cripto.Decrypt(cINI.ReadString("FTP", "user", ""));
-                string senha = Cripto.Decrypt(cINI.ReadString("FTP", "pass", ""));
-                cFPT = new FTP(URL, user, senha);
-                string nmPrograma = "TeleBonifacio.exe";
-                string Pasta = @"/public_html/public/entregas/";
-                string tamanho = cINI.ReadString("Config", "tamanho", "");
-                long tamanhoTotalArquivo = tamanho.Length > 0 ? long.Parse(tamanho) : 0;
-                string pastaAtual = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
-                string arquivoLocal = Path.Combine(pastaAtual, nmPrograma);
-                string arquivoBackup = arquivoLocal.Replace("Atualizacao", "Bak");
-                File.Copy(arquivoDestino, arquivoBackup, true);
-                if (cFPT.Download(Pasta, nmPrograma, worker, tamanhoTotalArquivo))
-                {
-                    long bytesReceived = cFPT.bytesReceived;
-                    cINI.WriteString("Config", "tamanho", bytesReceived.ToString());
-                    string pastaPrograma = Path.Combine(pastaAtual, "..");
-                    Log.Loga("pastaAtual : " + pastaAtual);
-                    Log.Loga("pastaPrograma : " + pastaPrograma);
-                    Log.Loga("pastaBackup : " + pastaBackup);
-                    if (!Directory.Exists(pastaBackup))
-                    {
-                        Directory.CreateDirectory(pastaBackup);
-                    }
-                    string PastaDestino = cINI.ReadString("Config", "Programa", "");
-                    Log.Loga("arquivoLocal : " + arquivoLocal);
-                    Log.Loga("arquivoDestino : " + arquivoDestino);
-                    Log.Loga("arquivoBackup : " + arquivoBackup);
-                    int versaoFtp = cFPT.LerVersaoDoFtp();
-                    string versaoNovaStr = $"{versaoFtp / 100}.{(versaoFtp / 10) % 10}.{versaoFtp % 10}";
-                    Log.Loga("Atualizando para " + versaoNovaStr);
-                    string VersaoAnterior = cINI.ReadString("Config", "VersaoAtual", "");
-                    if (VersaoAnterior.Length > 0)
-                    {
-                        Log.Loga("VersaoAnterior = "+ versaoNovaStr);
-                        cINI.WriteString("Atualizador", "VersaoAnterior", versaoNovaStr);
-                    }
-                    List<string> ComandosSQL = cFPT.getComandos();
-                    Log.Loga("Quantidade de comandos SQL" + ComandosSQL.Count.ToString());
-                    if (ComandosSQL.Count > 0)
-                    {
-                        string CaminhoBase = cINI.ReadString("Config", "Base", "");
-                        connectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + CaminhoBase + ";";
-                        for (int i = 0; i < ComandosSQL.Count; i++)
-                        {
-                            Log.Loga(ComandosSQL[i]);
-                            ExecutarComandoSQL(ComandosSQL[i]);
-                            Log.Loga("Comando Executado");
-                        }
-                    }
-                    cINI.WriteString("Config", "VersaoAtual", versaoNovaStr);
-                    System.Threading.Thread.Sleep(100);
-                    File.Copy(arquivoLocal, arquivoDestino, true);
-                    System.Threading.Thread.Sleep(100);
-                    Log.Loga("Executar programa em " + arquivoDestino);
-                    this.Invoke(new MethodInvoker(delegate { this.WindowState = FormWindowState.Minimized; }));
-                    System.Threading.Thread.Sleep(1000);
-                    e.Result = true;
-                }
-                else
-                {
-                    e.Result = false;
-                }
+                MessageBox.Show("Não foi identificado");
             }
         }
 
-        //private void Loga(string message)
-        //{
-        //    string logFilePath = @"C:\Entregas\Atualizador.txt";
-        //    using (StreamWriter writer = new StreamWriter(logFilePath, true))
-        //    {
-        //        writer.WriteLine($"{DateTime.Now}: {message}");
-        //    }
-        //}
+        private void txNro_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {                
+                e.SuppressKeyPress = true;
+                Busca();
+            }
+        }
 
     }
 }
