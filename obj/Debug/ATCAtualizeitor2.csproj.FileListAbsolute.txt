@@ -10,3 +10,15 @@ D:\Prog\ATCAtualizeitor2\bin\Debug\SourceGrid.dll
 D:\Prog\ATCAtualizeitor2\bin\Debug\SourceGrid.xml
 D:\Prog\ATCAtualizeitor2\obj\Debug\ATCAtualizeitor.exe
 D:\Prog\ATCAtualizeitor2\obj\Debug\ATCAtualizeitor.pdb
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\bin\Debug\ATCAtualizeitor.exe.config
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\bin\Debug\ATCAtualizeitor.exe
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\bin\Debug\ATCAtualizeitor.pdb
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\bin\Debug\SourceGrid.dll
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\bin\Debug\SourceGrid.xml
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\obj\Debug\ATCAtualizeitor2.csproj.AssemblyReference.cache
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\obj\Debug\ATCAtualizeitor.Form1.resources
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\obj\Debug\ATCAtualizeitor.Properties.Resources.resources
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\obj\Debug\ATCAtualizeitor2.csproj.GenerateResource.cache
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\obj\Debug\ATCAtualizeitor2.csproj.CoreCompileInputs.cache
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\obj\Debug\ATCAtualizeitor.exe
+D:\Prog\ATCAtualizeitor2\ATCAtualizeitor2\obj\Debug\ATCAtualizeitor.pdb

@@ -27,128 +27,143 @@ namespace ATCAtualizeitor
         {
 
         }
-
+        
         public int LerVersaoDoFtp()
         {
+            // Refatorado em 11/08/24 Original 50 linhas, resultado 34 linhas
             string caminhoArquivo = "/public_html/public/entregas/versao.txt";
-            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(new Uri("ftp://" + this.ftpIPServidor + caminhoArquivo));
-            request.Credentials = new NetworkCredential(this.ftpUsuarioID, this.ftpSenha);
-            request.Method = WebRequestMethods.Ftp.DownloadFile;
-            request.UsePassive = true;
-            FtpWebResponse response;
+            FtpWebRequest request = CriarFtpRequest(caminhoArquivo);
             try
             {
-                response = (FtpWebResponse)request.GetResponse();
+                using (FtpWebResponse response = (FtpWebResponse)request.GetResponse())
+                using (Stream responseStream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(responseStream))
+                {
+                    string info = reader.ReadToEnd();
+                    return ProcessarResposta(info);
+                }
             }
             catch (WebException ex)
             {
                 throw new Exception("Erro ao conectar ao servidor FTP: " + ex.Message);
             }
-            Stream responseStream = response.GetResponseStream();
-            StreamReader reader = new StreamReader(responseStream);
-            string info = reader.ReadToEnd();
-            string[] lines = info.Split('|');
-            string versaoTexto = lines[0];
-            this.Mensagem = lines[1];
-            this.ComandosSQL = new List<string>();
-            if (lines.Length > 2)
+            catch (Exception ex)
             {
-                for (int i = 2; i < lines.Length; i++)
-                {
-                    this.ComandosSQL.Add(lines[i]);
-                }
+                throw new Exception("Erro ao ler versão do FTP: " + ex.Message);
             }
-            reader.Close();
-            responseStream.Close();
-            response.Close();
-            int versaoNumero = int.Parse(versaoTexto.Replace(".", ""));
-            return versaoNumero;
         }
 
-        public string retMensagem()
+        private FtpWebRequest CriarFtpRequest(string caminhoArquivo)
         {
-            return this.Mensagem;
+            FtpWebRequest request = (FtpWebRequest)WebRequest.Create(new Uri("ftp://" + this.ftpIPServidor + caminhoArquivo));
+            request.Credentials = new NetworkCredential(this.ftpUsuarioID, this.ftpSenha);
+            request.Method = WebRequestMethods.Ftp.DownloadFile;
+            request.UsePassive = true;
+            return request;
         }
+
+        private int ProcessarResposta(string info)
+        {
+            // info = "2.5.8;TESTE;Update Vendedores Set Nome = 'DENISS' Where ID = 1";
+            string[] parts = info.Split(new[] { ';' }, 3, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length == 0)
+                throw new Exception("Arquivo de versão vazio ou inválido.");
+
+            string versaoTexto = parts[0].Trim();
+            this.Mensagem = parts.Length > 1 ? parts[1].Trim() : "";
+            ProcessarComandos(parts.Length > 2 ? parts[2] : null);
+            return int.Parse(versaoTexto.Replace(".", ""));
+        }
+
+        private void ProcessarComandos(string comandosTexto)
+        {
+            this.ComandosSQL = new List<string>();
+            if (!string.IsNullOrEmpty(comandosTexto))
+            {
+                string[] comandos = comandosTexto.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string comando in comandos)
+                {
+                    string comandoTrimmed = comando.Trim();
+                    if (!string.IsNullOrEmpty(comandoTrimmed))
+                    {
+                        this.ComandosSQL.Add(comandoTrimmed);
+                    }
+                }
+            }
+        }
+
+        //public int LerVersaoDoFtp()
+        //{
+        //    string caminhoArquivo = "/public_html/public/entregas/versao.txt";
+        //    FtpWebRequest request = (FtpWebRequest)WebRequest.Create(new Uri("ftp://" + this.ftpIPServidor + caminhoArquivo));
+        //    request.Credentials = new NetworkCredential(this.ftpUsuarioID, this.ftpSenha);
+        //    request.Method = WebRequestMethods.Ftp.DownloadFile;
+        //    request.UsePassive = true;
+
+        //    FtpWebResponse response = null;
+        //    Stream responseStream = null;
+        //    StreamReader reader = null;
+        //    try
+        //    {
+        //        response = (FtpWebResponse)request.GetResponse();
+        //        responseStream = response.GetResponseStream();
+        //        reader = new StreamReader(responseStream);
+        //        string info = reader.ReadToEnd();
+        //        string[] parts = info.Split(new[] { ';' }, 3, StringSplitOptions.RemoveEmptyEntries);
+        //        if (parts.Length > 0)
+        //        {
+        //            string versaoTexto = parts[0].Trim();
+
+        //            if (parts.Length > 1)
+        //            {
+        //                this.Mensagem = parts[1].Trim();
+        //            }
+        //            else
+        //            {
+        //                this.Mensagem = "";
+        //            }
+
+        //            this.ComandosSQL = new List<string>();
+        //            if (parts.Length > 2)
+        //            {
+        //                string[] comandos = parts[2].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+        //                foreach (string comando in comandos)
+        //                {
+        //                    string comandoTrimmed = comando.Trim();
+        //                    if (!string.IsNullOrEmpty(comandoTrimmed))
+        //                    {
+        //                        this.ComandosSQL.Add(comandoTrimmed);
+        //                    }
+        //                }
+        //            }
+
+        //            int versaoNumero = int.Parse(versaoTexto.Replace(".", ""));
+        //            return versaoNumero;
+        //        }
+        //        else
+        //        {
+        //            throw new Exception("Arquivo de versão vazio ou inválido.");
+        //        }
+        //    }
+        //    catch (WebException ex)
+        //    {
+        //        throw new Exception("Erro ao conectar ao servidor FTP: " + ex.Message);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception("Erro ao ler versão do FTP: " + ex.Message);
+        //    }
+        //    finally
+        //    {
+        //        if (reader != null) reader.Close();
+        //        if (responseStream != null) responseStream.Close();
+        //        if (response != null) response.Close();
+        //    }
+        //}
 
         public List<string> getComandos()
         {
             return this.ComandosSQL;
-        }
-
-        public string getErro()
-        {
-            return this.Erro;
-        }
-
-        public bool Download(string nmPasta, string nomeArquivoLocal, BackgroundWorker worker, long tamanhoTotalArquivo)
-        {
-            //bool isDebugging = System.Diagnostics.Debugger.IsAttached;
-            //if (isDebugging)
-            //{
-            //    return true;
-            //}
-            string Suri = "ftp://" + this.ftpIPServidor + @"/" + nmPasta + @"/" + nomeArquivoLocal;
-            const int maxTentativas = 3;
-            bool sucesso = false;
-            for (int tentativa = 1; tentativa <= maxTentativas; tentativa++)
-            {
-                FtpWebRequest requisicaoFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(Suri));
-                requisicaoFTP.Credentials = new NetworkCredential(this.ftpUsuarioID, this.ftpSenha);
-                requisicaoFTP.KeepAlive = false;
-                requisicaoFTP.Method = WebRequestMethods.Ftp.DownloadFile;
-                requisicaoFTP.UseBinary = true;
-                try
-                {
-                    using (FtpWebResponse respDown = (FtpWebResponse)requisicaoFTP.GetResponse())
-                    using (Stream responseStream = respDown.GetResponseStream())
-                    using (FileStream fileStream = File.Create(nomeArquivoLocal))
-                    {
-                        byte[] buffer = new byte[1024];
-                        int bytesRead;
-                        long bytesReceived = 0;
-                        while ((bytesRead = responseStream.Read(buffer, 0, buffer.Length)) > 0)
-                        {
-                            fileStream.Write(buffer, 0, bytesRead);
-                            bytesReceived += bytesRead;
-                            if (tamanhoTotalArquivo > 0)
-                            {
-                                int progresso = (int)((bytesReceived * 100) / tamanhoTotalArquivo);
-                                worker.ReportProgress(progresso);
-                            }
-                        }
-                    }
-                    if (Path.GetExtension(nomeArquivoLocal).ToLower() == ".exe")
-                    {
-                        if (VerificarArquivoExecutavel(nomeArquivoLocal))
-                        {
-                            sucesso = true;
-                            break;
-                        }
-                        else
-                        {
-                            File.Delete(nomeArquivoLocal);
-                            if (tentativa == maxTentativas)
-                            {
-                                Log.Loga("Erro: O arquivo executável no FTP parece estar corrompido após 3 tentativas.");
-                            }
-                        }
-                    }
-                    else
-                    {
-                        sucesso = true;
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log.Loga($"Erro na tentativa {tentativa}: {ex.Message}");
-                    if (tentativa == maxTentativas)
-                    {
-                        Log.Loga("Falha após 3 tentativas de download.");
-                    }
-                }
-            }
-            return sucesso;
         }
 
         private bool VerificarArquivoExecutavel(string caminhoArquivo)
@@ -189,6 +204,123 @@ namespace ATCAtualizeitor
                 return false;
             }
         }
+
+        public List<string> DownloadFileList(string nmPasta)
+        {
+            List<string> fileList = new List<string>();
+            string fileListPath = "arquivos.txt";
+            string Suri = $"ftp://{this.ftpIPServidor}/{nmPasta}/{fileListPath}";
+
+            FtpWebRequest requisicaoFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(Suri));
+            requisicaoFTP.Credentials = new NetworkCredential(this.ftpUsuarioID, this.ftpSenha);
+            requisicaoFTP.KeepAlive = false;
+            requisicaoFTP.Method = WebRequestMethods.Ftp.DownloadFile;
+            requisicaoFTP.UseBinary = true;
+
+            try
+            {
+                using (FtpWebResponse respDown = (FtpWebResponse)requisicaoFTP.GetResponse())
+                {
+                    using (Stream responseStream = respDown.GetResponseStream())
+                    {
+                        using (MemoryStream memoryStream = new MemoryStream())
+                        {
+                            responseStream.CopyTo(memoryStream);
+                            memoryStream.Position = 0;
+                            using (StreamReader reader = new StreamReader(memoryStream))
+                            {
+                                string content = reader.ReadToEnd();
+                                string[] files = content.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                                foreach (string file in files)
+                                {
+                                    fileList.Add(file.Trim());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Loga($"Erro ao baixar lista de arquivos: {ex.Message}");
+            }
+
+            return fileList;
+        }
+
+        public bool DownloadAllFiles(string nmPasta, List<string> fileList, BackgroundWorker worker)
+        {
+            long totalSize = GetTotalFileSize(nmPasta, fileList);
+            long downloadedSize = 0;
+
+            foreach (string fileName in fileList)
+            {
+                string Suri = $"ftp://{this.ftpIPServidor}/{nmPasta}/{fileName}";
+                FtpWebRequest requisicaoFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(Suri));
+                requisicaoFTP.Credentials = new NetworkCredential(this.ftpUsuarioID, this.ftpSenha);
+                requisicaoFTP.KeepAlive = true;
+                requisicaoFTP.Method = WebRequestMethods.Ftp.DownloadFile;
+                requisicaoFTP.UseBinary = true;
+
+                try
+                {
+                    using (FtpWebResponse respDown = (FtpWebResponse)requisicaoFTP.GetResponse())
+                    using (Stream responseStream = respDown.GetResponseStream())
+                    using (FileStream fileStream = File.Create(fileName))
+                    {
+                        byte[] buffer = new byte[8192];
+                        int bytesRead;
+                        while ((bytesRead = responseStream.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            fileStream.Write(buffer, 0, bytesRead);
+                            downloadedSize += bytesRead;
+                            int progress = (int)((downloadedSize * 100) / totalSize);
+                            worker.ReportProgress(progress);
+                        }
+                    }
+
+                    if (Path.GetExtension(fileName).ToLower() == ".exe" && !VerificarArquivoExecutavel(fileName))
+                    {
+                        File.Delete(fileName);
+                        Log.Loga($"Erro: O arquivo executável {fileName} parece estar corrompido.");
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Loga($"Erro ao baixar o arquivo {fileName}: {ex.Message}");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private long GetTotalFileSize(string nmPasta, List<string> fileList)
+        {
+            long totalSize = 0;
+            foreach (string fileName in fileList)
+            {
+                string Suri = $"ftp://{this.ftpIPServidor}/{nmPasta}/{fileName}";
+                FtpWebRequest sizeRequest = (FtpWebRequest)FtpWebRequest.Create(new Uri(Suri));
+                sizeRequest.Credentials = new NetworkCredential(this.ftpUsuarioID, this.ftpSenha);
+                sizeRequest.Method = WebRequestMethods.Ftp.GetFileSize;
+
+                try
+                {
+                    using (FtpWebResponse response = (FtpWebResponse)sizeRequest.GetResponse())
+                    {
+                        totalSize += response.ContentLength;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log.Loga($"Erro ao obter o tamanho do arquivo {fileName}: {ex.Message}");
+                }
+            }
+            return totalSize;
+        }
+
     }
 }
 
