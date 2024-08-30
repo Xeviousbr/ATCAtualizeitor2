@@ -13,10 +13,12 @@ namespace ATCAtualizeitor
         private FTP cFPT;
         private BackgroundWorker worker;
         private string arquivoDestino = @"C:\Entregas\TeleBonifacio.exe";
+        private string pasta = @"/public_html/public/entregas/";
         private INI cINI;
         private string connectionString = "";
         private int erros = 0;
         private string ERRO = "";
+        private string versaoNovaStr = "";
 
         private void ExecutarComandoSQL(string query)
         {
@@ -92,10 +94,10 @@ namespace ATCAtualizeitor
             Log.Loga("Fechando atualizador");
             Environment.Exit(0);
         }
-        
+
+        // Refatorado em 11/08/24 Original 93 linhas, resultado 65 linhas
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            // Refatorado em 11/08/24 Original 93 linhas, resultado 65 linhas
+        {            
             cINI = new INI();
             string retornar = cINI.ReadString("Atualizador", "Retornar", "");
             string pastaDoEntregas = cINI.ReadString("Atualizacao", "Programa", "");
@@ -111,16 +113,15 @@ namespace ATCAtualizeitor
             string url = cINI.ReadString("FTP", "URL", "");
             string user = Cripto.Decrypt(cINI.ReadString("FTP", "user", ""));
             string senha = Cripto.Decrypt(cINI.ReadString("FTP", "pass", ""));
-            cFPT = new FTP(url, user, senha);
-            string pasta = @"/public_html/public/entregas/";
+            cFPT = new FTP(url, user, senha);            
 
-            List<string> filesToDownload = cFPT.DownloadFileList(pasta);
+            List<string> filesToDownload = cFPT.DownloadFileList(this.pasta);
             if (filesToDownload.Count > 0)
             {
                 PrepararBackup(filesToDownload, pastaBackup);
-                if (cFPT.DownloadAllFiles(pasta, filesToDownload, worker))
+                if (cFPT.DownloadAllFiles(this.pasta, filesToDownload, worker))
                 {
-                    ProcessarAtualizacao(filesToDownload, cINI, pastaDoEntregas, e);
+                    ProcessarAtualizacao(filesToDownload, cINI, pastaDoEntregas, e);                    
                 }
                 else
                 {
@@ -132,6 +133,29 @@ namespace ATCAtualizeitor
                 Log.Loga("Nenhum arquivo para baixar.");
                 e.Result = false;
             }
+        }
+
+        private void InformarAtu()
+        {
+            // Criar o conteúdo do arquivo
+            string conteudo = this.versaoNovaStr;
+
+            // Criar um arquivo temporário local
+            string tempFile = "atualizado.txt"; // Path.GetTempFileName();
+            File.WriteAllText(tempFile, conteudo);
+
+            // Fazer upload do arquivo para o servidor FTP
+            if (cFPT.Upload("atualizado.txt", this.pasta))
+            {
+                Log.Loga("Arquivo atualizado.txt enviado com sucesso para o servidor FTP.");
+            }
+            else
+            {
+                Log.Loga("Falha ao enviar o arquivo atualizado.txt para o servidor FTP.");
+            }
+
+            // Remover o arquivo temporário
+            File.Delete(tempFile);
         }
 
         private void ProcessarRetorno(INI cINI, string pastaDoEntregas, DoWorkEventArgs e)
@@ -170,15 +194,17 @@ namespace ATCAtualizeitor
             string pastaAtual = Path.GetDirectoryName(Process.GetCurrentProcess().MainModule.FileName);
             string pastaDestino = cINI.ReadString("Config", "Programa", "");
             int versaoFtp = cFPT.LerVersaoDoFtp();
-            string versaoNovaStr = $"{versaoFtp / 100}.{(versaoFtp / 10) % 10}.{versaoFtp % 10}";
-            Log.Loga("Atualizando para " + versaoNovaStr);
+            this.versaoNovaStr = $"{versaoFtp / 100}.{(versaoFtp / 10) % 10}.{versaoFtp % 10}";
+            Log.Loga("Atualizando para " + this.versaoNovaStr);
 
             AtualizarVersaoAnterior(cINI);
             ExecutarComandosSQL(cINI);
 
-            cINI.WriteString("Config", "VersaoAtual", versaoNovaStr);
+            cINI.WriteString("Config", "VersaoAtual", this.versaoNovaStr);
             System.Threading.Thread.Sleep(100);
             CopiarArquivosAtualizados(filesToDownload, pastaAtual, pastaDestino);
+
+            InformarAtu();
 
             System.Threading.Thread.Sleep(100);
             Log.Loga("Executar programa em " + pastaDestino);

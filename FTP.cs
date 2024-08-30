@@ -92,74 +92,99 @@ namespace ATCAtualizeitor
             }
         }
 
-        //public int LerVersaoDoFtp()
-        //{
-        //    string caminhoArquivo = "/public_html/public/entregas/versao.txt";
-        //    FtpWebRequest request = (FtpWebRequest)WebRequest.Create(new Uri("ftp://" + this.ftpIPServidor + caminhoArquivo));
-        //    request.Credentials = new NetworkCredential(this.ftpUsuarioID, this.ftpSenha);
-        //    request.Method = WebRequestMethods.Ftp.DownloadFile;
-        //    request.UsePassive = true;
+        public bool Upload(string _nomeArquivo, string Caminho)
+        {
+            string Cam = Caminho.Replace(@"\", @"/");
+            string caminhoArquivo = Path.Combine(Caminho, _nomeArquivo);
+            FileInfo _arquivoInfo = new FileInfo(caminhoArquivo);
+            string Suri = "ftp://" + this.ftpIPServidor + @"/" + Cam + _arquivoInfo.Name;
+            FtpWebRequest requisicaoFTP;
+            requisicaoFTP = (FtpWebRequest)FtpWebRequest.Create(new Uri(Suri));
+            requisicaoFTP.Credentials = new NetworkCredential(this.ftpUsuarioID, this.ftpSenha);
+            requisicaoFTP.KeepAlive = false;
+            requisicaoFTP.Method = WebRequestMethods.Ftp.UploadFile;
+            requisicaoFTP.UseBinary = true;
+            requisicaoFTP.ContentLength = _arquivoInfo.Length;
+            FileStream fs = _arquivoInfo.OpenRead();
+            bool sair = false;
+            bool bReturn = false;
+            while (sair == false)
+            {
+                string ret = this.UploadEmSi(requisicaoFTP, fs);
+                if (ret == "")
+                {
+                    bReturn = true;
+                    sair = true;
+                }
+                else
+                {
+                    if (ret.IndexOf("553") > 0)
+                    {
+                        string sUrlD = "ftp://" + this.ftpIPServidor + Cam;
+                        FtpWebRequest requestCD = (FtpWebRequest)FtpWebRequest.Create(new Uri(sUrlD));
+                        requestCD.Credentials = new NetworkCredential(this.ftpUsuarioID, this.ftpSenha);
+                        requestCD.KeepAlive = false;
+                        requestCD.Method = WebRequestMethods.Ftp.MakeDirectory;
+                        requestCD.Credentials = new NetworkCredential("user", "pass");
+                        try
+                        {
+                            using (var resp = (FtpWebResponse)requestCD.GetResponse())
+                            {
+                                Console.WriteLine(resp.StatusCode);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            bReturn = false;
+                            sair = true;
+                        }
+                    }
+                    else
+                    {
+                        bReturn = false;
+                        sair = true;
+                    }
+                }
+            }
+            return bReturn;
+        }
 
-        //    FtpWebResponse response = null;
-        //    Stream responseStream = null;
-        //    StreamReader reader = null;
-        //    try
-        //    {
-        //        response = (FtpWebResponse)request.GetResponse();
-        //        responseStream = response.GetResponseStream();
-        //        reader = new StreamReader(responseStream);
-        //        string info = reader.ReadToEnd();
-        //        string[] parts = info.Split(new[] { ';' }, 3, StringSplitOptions.RemoveEmptyEntries);
-        //        if (parts.Length > 0)
-        //        {
-        //            string versaoTexto = parts[0].Trim();
+        internal bool UploadFile(string tempFile, string v)
+        {
+            throw new NotImplementedException();
+        }
 
-        //            if (parts.Length > 1)
-        //            {
-        //                this.Mensagem = parts[1].Trim();
-        //            }
-        //            else
-        //            {
-        //                this.Mensagem = "";
-        //            }
+        private string UploadEmSi(FtpWebRequest requisicaoFTP, FileStream fs)
+        {
+            try
+            {
+                // Stream  para o qual o arquivo a ser enviado será escrito
+                Stream strm = requisicaoFTP.GetRequestStream();
 
-        //            this.ComandosSQL = new List<string>();
-        //            if (parts.Length > 2)
-        //            {
-        //                string[] comandos = parts[2].Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-        //                foreach (string comando in comandos)
-        //                {
-        //                    string comandoTrimmed = comando.Trim();
-        //                    if (!string.IsNullOrEmpty(comandoTrimmed))
-        //                    {
-        //                        this.ComandosSQL.Add(comandoTrimmed);
-        //                    }
-        //                }
-        //            }
+                int buffLength = 2048;
+                byte[] buff = new byte[buffLength];
 
-        //            int versaoNumero = int.Parse(versaoTexto.Replace(".", ""));
-        //            return versaoNumero;
-        //        }
-        //        else
-        //        {
-        //            throw new Exception("Arquivo de versão vazio ou inválido.");
-        //        }
-        //    }
-        //    catch (WebException ex)
-        //    {
-        //        throw new Exception("Erro ao conectar ao servidor FTP: " + ex.Message);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception("Erro ao ler versão do FTP: " + ex.Message);
-        //    }
-        //    finally
-        //    {
-        //        if (reader != null) reader.Close();
-        //        if (responseStream != null) responseStream.Close();
-        //        if (response != null) response.Close();
-        //    }
-        //}
+                // Lê a partir do arquivo stream, 2k por vez
+                int tamanhoConteudo = fs.Read(buff, 0, buffLength);
+
+                // ate o conteudo do stream terminar
+                while (tamanhoConteudo != 0)
+                {
+                    // Escreve o conteudo a partir do arquivo para o stream FTP 
+                    strm.Write(buff, 0, tamanhoConteudo);
+                    tamanhoConteudo = fs.Read(buff, 0, buffLength);
+                }
+
+                // Fecha o stream a requisição
+                strm.Close();
+                fs.Close();
+                return "";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
+        }
 
         public List<string> getComandos()
         {

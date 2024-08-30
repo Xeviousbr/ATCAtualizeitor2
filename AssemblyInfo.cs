@@ -11,7 +11,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 [assembly: Guid("308c57af-e663-456d-8a2c-188bbd61423f")]
-[assembly: AssemblyVersion("2.0.2.0")]
-[assembly: AssemblyFileVersion("2.0.2.0")]
+[assembly: AssemblyVersion("2.0.4.0")]
+[assembly: AssemblyFileVersion("2.0.4.0")]
+// 2.0.4 Envio da informação de que foi atualizado
+// 2.0.3 Arquivos múltiplos e separação por ;
 // 2.0.2 Verifica se é executável 64bit
 // 2.0.1 Separação por |
